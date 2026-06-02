@@ -13,6 +13,11 @@ ingress:
   className: nginx
   host: enterprise.local
 
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+
 resources:
   limits:
     cpu: 500m
