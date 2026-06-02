@@ -1,0 +1,7 @@
+replicaCount: 2
+
+image:
+  tag: dev
+
+ingress:
+  host: dev.enterprise.com
