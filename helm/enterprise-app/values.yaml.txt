@@ -1,0 +1,23 @@
+replicaCount: 2
+
+image:
+  repository: myacr.azurecr.io/enterprise-app
+  tag: latest
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: nginx
+  host: enterprise.local
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+  requests:
+    cpu: 250m
+    memory: 256Mi
