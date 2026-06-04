@@ -2,7 +2,7 @@ replicaCount: 2
 
 image:
   repository: portainer22.azurecr.io/enterprise-app
-  tag: "10510a2dfa147f18c4fc255319c746d23e117b0a"
+  tag: "765e990907fdb2b76eae9df03399045713a24d58"
 
 service:
   type: ClusterIP
