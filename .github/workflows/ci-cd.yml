@@ -21,30 +21,32 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Verify Azure Subscription
+        run: |
+          az account show
+          az acr show --name portainer22 --query loginServer -o tsv
+
       - name: Login to Azure Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ secrets.ACR_NAME }}.azurecr.io
-          username: ${{ secrets.ACR_USERNAME }}
-          password: ${{ secrets.ACR_PASSWORD }}
+        run: |
+          az acr login --name portainer22
 
       - name: Build Docker Image
         run: |
           docker build \
-            -t ${{ secrets.ACR_NAME }}.azurecr.io/enterprise-app:${{ github.sha }} \
-            ./app
+            -t portainer22.azurecr.io/enterprise-app:${{ github.sha }} \
+            .
 
       - name: Trivy Security Scan
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ secrets.ACR_NAME }}.azurecr.io/enterprise-app:${{ github.sha }}
+          image-ref: portainer22.azurecr.io/enterprise-app:${{ github.sha }}
           format: table
           exit-code: 0
 
       - name: Push Docker Image
         run: |
           docker push \
-            ${{ secrets.ACR_NAME }}.azurecr.io/enterprise-app:${{ github.sha }}
+            portainer22.azurecr.io/enterprise-app:${{ github.sha }}
 
       - name: Update Helm Image Tag
         run: |
@@ -57,6 +59,6 @@ jobs:
 
           git add helm/enterprise-app/values.yaml
 
-          git commit -m "Update image tag to ${{ github.sha }}" || echo "No changes"
+          git commit -m "Update image tag to ${{ github.sha }}" || echo "No changes to commit"
 
           git push
