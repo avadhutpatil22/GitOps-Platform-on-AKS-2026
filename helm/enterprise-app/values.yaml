@@ -1,7 +1,7 @@
 replicaCount: 2
 
 image:
-  repository: gitopsacr001.azurecr.io/enterprise-app
+  repository: portainer22.azurecr.io/enterprise-app
   tag: v1
 
 service:
