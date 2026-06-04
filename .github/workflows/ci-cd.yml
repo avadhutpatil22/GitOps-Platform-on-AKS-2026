@@ -75,9 +75,7 @@ jobs:
 
       - name: Commit Helm Changes
         run: |
-          git config --global user.name "avadhutpatil22"
-          git config --global user.email "patilavadhut907@gmail.com"
-
+          
           git add enterprise-gitops-platform/helm/enterprise-app/values.yaml
 
           git commit -m "Update image tag to ${{ github.sha }}" || echo "No changes to commit"
