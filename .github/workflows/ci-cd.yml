@@ -76,7 +76,7 @@ jobs:
       - name: Commit Helm Changes
         run: |
           
-          git add enterprise-gitops-platform/helm/enterprise-app/values.yaml
+          git add helm/enterprise-app/values.yaml
 
           git commit -m "Update image tag to ${{ github.sha }}" || echo "No changes to commit"
 
