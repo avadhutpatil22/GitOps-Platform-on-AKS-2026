@@ -32,13 +32,27 @@ jobs:
 
       - name: Verify Repository Structure
         run: |
+          echo "Current Directory:"
           pwd
+
+          echo "Dockerfiles:"
           find . -name Dockerfile
+
+          echo "Requirements Files:"
+          find . -name requirements.txt
+
+          echo "Values Files:"
           find . -name values.yaml
+
+          echo "App Directory Contents:"
+          ls -la enterprise-gitops-platform/app || true
+
+          echo "Full Repository Structure:"
+          find . -type f | sort
 
       - name: Build Docker Image
         run: |
-          docker build \
+          docker build --no-cache \
             -f enterprise-gitops-platform/app/Dockerfile \
             -t portainer22.azurecr.io/enterprise-app:${{ github.sha }} \
             enterprise-gitops-platform/app
@@ -61,8 +75,8 @@ jobs:
 
       - name: Commit Helm Changes
         run: |
-          git config --global user.name "avadhutpatil22"
-          git config --global user.email "patilavadhut907@gmail.com"
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
 
           git add enterprise-gitops-platform/helm/enterprise-app/values.yaml
 
