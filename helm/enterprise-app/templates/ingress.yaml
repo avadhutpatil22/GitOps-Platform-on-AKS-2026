@@ -5,6 +5,7 @@ kind: Ingress
 
 metadata:
   name: enterprise-app
+  namespace: {{ .Release.Namespace }}
 
 spec:
   ingressClassName: {{ .Values.ingress.className }}
