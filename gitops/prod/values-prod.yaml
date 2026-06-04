@@ -1,7 +1,0 @@
-replicaCount: 5
-
-image:
-  tag: prod
-
-ingress:
-  host: enterprise.com

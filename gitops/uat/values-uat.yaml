@@ -1,7 +1,0 @@
-replicaCount: 3
-
-image:
-  tag: uat
-
-ingress:
-  host: uat.enterprise.com
