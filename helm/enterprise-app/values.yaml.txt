@@ -1,0 +1,18 @@
+replicaCount: 2
+
+image:
+  repository: gitopsacr001.azurecr.io/enterprise-app
+  tag: v1
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  host: enterprise.local
+
+hpa:
+  minReplicas: 2
+  maxReplicas: 10
+  cpu: 70
