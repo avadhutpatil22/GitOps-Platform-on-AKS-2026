@@ -21,7 +21,7 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Verify Azure Subscription
+      - name: Verify Azure Resources
         run: |
           az account show
           az acr show --name portainer22 --query loginServer -o tsv
@@ -30,11 +30,18 @@ jobs:
         run: |
           az acr login --name portainer22
 
+      - name: Verify Repository Structure
+        run: |
+          pwd
+          find . -name Dockerfile
+          find . -name values.yaml
+
       - name: Build Docker Image
         run: |
           docker build \
+            -f enterprise-gitops-platform/app/Dockerfile \
             -t portainer22.azurecr.io/enterprise-app:${{ github.sha }} \
-            .
+            enterprise-gitops-platform/app
 
       - name: Trivy Security Scan
         uses: aquasecurity/trivy-action@master
@@ -45,19 +52,19 @@ jobs:
 
       - name: Push Docker Image
         run: |
-          docker push \
-            portainer22.azurecr.io/enterprise-app:${{ github.sha }}
+          docker push portainer22.azurecr.io/enterprise-app:${{ github.sha }}
 
       - name: Update Helm Image Tag
         run: |
-          sed -i "s/tag:.*/tag: \"${{ github.sha }}\"/g" helm/enterprise-app/values.yaml
+          sed -i "s/tag:.*/tag: \"${{ github.sha }}\"/g" \
+          enterprise-gitops-platform/helm/enterprise-app/values.yaml
 
       - name: Commit Helm Changes
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
+          git config --global user.name "avadhutpatil22"
+          git config --global user.email "patilavadhut907@gmail.com"
 
-          git add helm/enterprise-app/values.yaml
+          git add enterprise-gitops-platform/helm/enterprise-app/values.yaml
 
           git commit -m "Update image tag to ${{ github.sha }}" || echo "No changes to commit"
 
