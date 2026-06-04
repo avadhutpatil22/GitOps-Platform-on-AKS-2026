@@ -4,11 +4,11 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return "Enterprise GitOps Platform Running"
+    return "Enterprise GitOps Application Running on AKS"
 
 @app.route("/health")
 def health():
-    return "OK"
+    return {"status": "healthy"}
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
