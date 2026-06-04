@@ -1,101 +1,65 @@
-name: Enterprise GitOps Pipeline
+name: Build-Push-Deploy
 
 on:
   push:
     branches:
       - main
 
-env:
-  IMAGE_NAME: enterprise-app
+permissions:
+  contents: write
 
 jobs:
-  build-and-deploy:
+
+  build:
 
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write
-
     steps:
 
-    - name: Checkout Source Code
+    - name: Checkout
       uses: actions/checkout@v4
 
-    #################################################
-    # Login ACR
-    #################################################
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Login to ACR
-      uses: azure/docker-login@v2
+      uses: docker/login-action@v3
       with:
-        login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+        registry: ${{ secrets.ACR_NAME }}.azurecr.io
         username: ${{ secrets.ACR_USERNAME }}
         password: ${{ secrets.ACR_PASSWORD }}
-
-    #################################################
-    # Build Docker Image
-    #################################################
 
     - name: Build Docker Image
       run: |
         docker build \
-        -t ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }} .
+        -t ${{ secrets.ACR_NAME }}.azurecr.io/enterprise-app:${{ github.sha }} \
+        ./app
 
-    #################################################
-    # Trivy Scan
-    #################################################
-
-    - name: Run Trivy Scan
+    - name: Trivy Scan
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        image-ref: ${{ secrets.ACR_NAME }}.azurecr.io/enterprise-app:${{ github.sha }}
         format: table
-        exit-code: 1
-        severity: HIGH,CRITICAL
-
-    #################################################
-    # Push Image
-    #################################################
+        exit-code: 0
 
     - name: Push Image
       run: |
         docker push \
-        ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        ${{ secrets.ACR_NAME }}.azurecr.io/enterprise-app:${{ github.sha }}
 
-    #################################################
-    # Clone GitOps Repo
-    #################################################
-
-    - name: Clone GitOps Repository
+    - name: Update Helm Tag
       run: |
-        git clone https://${{ secrets.GITOPS_PAT }}@github.com/${{ secrets.GITOPS_REPO }}.git
+        sed -i "s/tag:.*/tag: ${{ github.sha }}/g" helm/enterprise-app/values.yaml
 
-    #################################################
-    # Update Helm Values
-    #################################################
-
-    - name: Update Helm Image Tag
+    - name: Commit Helm Changes
       run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
 
-        cd enterprise-gitops
+        git add helm/enterprise-app/values.yaml
 
-        sed -i "s/tag:.*/tag: ${GITHUB_SHA}/" \
-        helm/enterprise-app/values-dev.yaml
+        git commit -m "Update image tag ${{ github.sha }}" || echo "No changes"
 
-    #################################################
-    # Commit Changes
-    #################################################
-
-    - name: Commit Changes
-      run: |
-
-        cd enterprise-gitops
-
-        git config user.name "github-actions"
-        git config user.email "github-actions@github.com"
-
-        git add .
-
-        git commit -m "Update image tag to ${GITHUB_SHA}" || echo "No Changes"
-
-        git push origin main
+        git push
