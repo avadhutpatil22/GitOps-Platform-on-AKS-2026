@@ -2,7 +2,7 @@ replicaCount: 2
 
 image:
   repository: avadhootacr001.azurecr.io/enterprise-app
-  tag: "f4e99533ab3785638b5115367b8eb6de038bbe19"
+  tag: "c8de79b0bfe36cdf3c464099d9361c6819b41072"
 
 service:
   type: ClusterIP
