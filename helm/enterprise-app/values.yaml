@@ -1,7 +1,7 @@
 replicaCount: 2
 
 image:
-  repository: portainer22.azurecr.io/enterprise-app
+  repository: avadhootacr001.azurecr.io/enterprise-app
   tag: "f4e99533ab3785638b5115367b8eb6de038bbe19"
 
 service:
