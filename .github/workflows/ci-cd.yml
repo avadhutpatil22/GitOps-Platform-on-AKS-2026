@@ -24,11 +24,11 @@ jobs:
       - name: Verify Azure Resources
         run: |
           az account show
-          az acr show --name portainer22 --query loginServer -o tsv
+          az acr show --name avadhootacr001 --query loginServer -o tsv
 
       - name: Login to Azure Container Registry
         run: |
-          az acr login --name portainer22
+          az acr login --name avadhootacr001
 
       - name: Verify Repository Structure
         run: |
@@ -54,19 +54,19 @@ jobs:
         run: |
           docker build --no-cache \
             -f enterprise-gitops-platform/app/Dockerfile \
-            -t portainer22.azurecr.io/enterprise-app:${{ github.sha }} \
+            -t avadhootacr001.azurecr.io/enterprise-app:${{ github.sha }} \
             enterprise-gitops-platform/app
 
       - name: Trivy Security Scan
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: portainer22.azurecr.io/enterprise-app:${{ github.sha }}
+          image-ref: avadhootacr001.azurecr.io/enterprise-app:${{ github.sha }}
           format: table
           exit-code: 0
 
       - name: Push Docker Image
         run: |
-          docker push portainer22.azurecr.io/enterprise-app:${{ github.sha }}
+          docker push avadhootacr001.azurecr.io/enterprise-app:${{ github.sha }}
 
       - name: Update Helm Image Tag
         run: |
